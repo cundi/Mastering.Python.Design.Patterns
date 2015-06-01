@@ -33,6 +33,7 @@ Django框架使用工厂方法模式创建一个表单的字段。Django的forms
 
 这些地址也在输出中打印出来，所以我们可以检验它们。如下，内存地址的实际情况是两个有明显区别的对象的以不同方法来创建：   
 
+```python
     Class A(object):
 		pass
 		
@@ -42,13 +43,15 @@ Django框架使用工厂方法模式创建一个表单的字段。Django的forms
 		
 		print(id(a) == id(b))
 		print(a, b)
-		
+```
   
 在电脑上执行id.py的给出如下输入内容：  
+```python
     python3 id.py 
  	False
  	<__main__.A object at 0x7f5771de8f60> <__main__.A object at 0x7f5771df2208>”
-
+``` 	
+  
 注意，如果你执行文件所见到的地址和我所见到不相同，那是因为它们依赖当前内存布局和分配。但是结果必须是一样：两个地址应该是不一样的。如果你在Python的读取-求职-打印 循环（REPL）（交互提示环境）中写和执行代码会有异常发生，但是针对REPL的优化是通常不可能有的。   
 
 ###实现
@@ -60,7 +63,7 @@ Django框架使用工厂方法模式创建一个表单的字段。Django的forms
 
 首先，让我们看看数据文件。如下，XML文件person.xml，基于Wikipedia的例子，包含单独的信息（firstName, lastName, gender，等等）：
 
-
+```python
     <persons>
     <person>
 	<firstName>John</firstName>
@@ -116,9 +119,11 @@ Django框架使用工厂方法模式创建一个表单的字段。Django的forms
 				    </gender>
 				  </person>
 				</persons>
+```
   
 JSON文件donut.json，来自Github上面的Adobe账户，  包含甜甜圈信息（type,即价格和单元，ppu, topping，等等）如下：   
 
+```python
 	[
 	  {
 	    "id": "0001",
@@ -182,15 +187,18 @@ JSON文件donut.json，来自Github上面的Adobe账户，  包含甜甜圈信�
 		    ]
 		  }
 		]
-
+```
+  
 我们会对XML和JSON使用Python发行版中的两个库的一部分：xml.etree.ElementTree和json：
 
+```python
 	import xml.etree.ElementTree as etree
 	import json
-
+```
+  
 JSONConnector类解析JSON文件，含有一个将所有数据作为一个字典(dict)返回的parsed_data()方法。property装饰器用来使parsed_data()作为一个正常变量出现而不是作为一个方法出现：   
 
-   
+```python
     Class JSONConnector:
 		def __init__(self, filepath):
 			self.data = dict()
@@ -200,10 +208,11 @@ JSONConnector类解析JSON文件，含有一个将所有数据作为一个字典
 		@property
 		def parsed_data(self):
 			return self.data
-	
-
+```	
+  
 XMLConnector类解析XML文件并含有把所有数据作为一个xml.etree.Element的列表的一个parsed_data()方法：
 
+```python
     Class XMLConnector:
 		
 		def __init__(self, filepath):
@@ -212,10 +221,11 @@ XMLConnector类解析XML文件并含有把所有数据作为一个xml.etree.Elem
 		@property
 		def parsed_data(self):
 			return self.tree
-			
-
+```			
+  
 connection_factory()函数是一个工厂方法。它基于输入文件的扩展，返回一个JSONConnector或者XMLConnector的实例：
 
+```python
     def connection_factory(filepath):
 		if filepath.endwith('json'):
 			connector = JSONConnector
@@ -224,10 +234,8 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
 		else:
 			raise ValueError('Cannot connect to {}'.format(filepaht))
 		return connector(filepath)
-		
-
-
-                       
+```
+  
 
 抽象工厂
 ------------
@@ -249,6 +257,8 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
   为了阐明抽象工厂模式，我将再次使用我最喜爱的例子之一。想象我们正在开发一款游戏，或者我们想把一款小游戏加入到自己的应用中来娱乐用户。我们想要至少包含两个游戏，一个给小孩子玩，一个给成人玩。基于用户输入，我们要决定在运用时创建哪一个游戏。一个抽象工厂便能做到游戏的创建部分。   
   
   让我们从儿童游戏开始吧。这个游戏叫做FrogWorld。主角是一个喜欢迟昆虫的青蛙。每个主角都需要的一个响亮的名号，在运行时，我们的这个例子中名字是由用户给出的。如下所示， interact_with()方法用于描述青蛙和障碍物（例如，虫子，迷宫以及别的青蛙）的互动：
+  
+```python
     Class Frog:
 		def __init__(self, name):
 			self.name = name
@@ -258,17 +268,22 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
 			
 		def interact_with(self, obstacle):
 			print('{} the Frog encounters {} and {}!'.format(self, obstacle, obstacle.action()))
+```
   
   可以有很多种类的障碍，不过对于我们的这个例子来说可以只有一个Bug。青蛙遇到一个虫子，只有一个行为被支持：吃掉它！  
    
+```python
      Class Bug:
 	 	def __str__(self):
 			return 'a bug'
 			   
 		def action(self):
 			return 'eats it'
+```
   
-  FrogWorld类是一个抽象工厂。它的主要责任是游戏的主角和障碍物。保持创建方法的独立和方法名称的普通（例如，make_character(), make _obstacle()）让我们可以动态的改变活动工厂（以及活动的游戏）而不设计任何的代码变更。如下所示，在一个静态类型语言中，抽象工厂可以是一个有着空方法的抽象类/接口，但是在Python中不要求这么做，因为类型在运行时才被检查。   
+  FrogWorld类是一个抽象工厂。它的主要责任是游戏的主角和障碍物。保持创建方法的独立和方法名称的普通（例如，make_character(), make _obstacle()）让我们可以动态的改变活动工厂（以及活动的游戏）而不设计任何的代码变更。如下所示，在一个静态类型语言中，抽象工厂可以是一个有着空方法的抽象类/接口，但是在Python中不要求这么做，因为类型在运行时才被检查。
+  
+```python
     Class FrogWorld:
 		def __inti__(self, name):
 			print(self)
@@ -282,9 +297,11 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
 			
 		def make_obstacle(self):
 			return Bug()
-			
+```			
    
    游戏WizarWorld也类似。唯一的不同是巫师不吃虫子而是与半兽人这样的怪物战斗！
+   
+```python
      Class Wizard:
 	 	def __init__(self, name):
 			self.name = name
@@ -318,10 +335,11 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
 			
 		def make_obstacle(self):
 			return Ork()
-			
+```			
    
    GameEnviroment是我们游戏的主要入口。它接受factory作为输入，然后用它创建游戏的世界。play()方法发起创造的hero和obstacle之间的交互如下：  
    
+```python
     Class GameEnviroment:
 		def __init__(self, factory):
 			self.hero = factory.make_character()
@@ -329,9 +347,11 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
 			
 		def play(self):
 			self.hero.interact_with(self.obstacle)
-			
+```
+  
   validate_age()函数提示用户输入一个有效的年龄。若年龄无效，则返回一个第一个元素设置为False的元组。如下所示，若输入的年龄没问题，元组的第一个元素设置为True，以及我们所关心的该元组的第二个元素，即用户给定的年龄：
    
+```python
     def validate_age(name):
 		try:
 			age = input('Welcome {}. How old are you？'.format(name))
@@ -341,9 +361,11 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
 			return (False, age)
 		return (True, age)
 		
-   
+```
+  
    最后，尤其是main()函数的出现。它询问用户的名字和年龄，然后由用户的年龄来决定哪一个游戏应该被运行：
-     
+ 
+ ```python    
 	 def main():
 	 	name = input("Hello. What's your name?")
 		valid_input = False
@@ -352,7 +374,7 @@ connection_factory()函数是一个工厂方法。它基于输入文件的扩展
 			game = FrogWorld if age < 18 else WizardWorld
 			enviroment = GameEnviroment(game(name))
 			enviroment.play()
-			
+```			
   
   抽象工厂实现（abstrac_factory.py）的完整代码如下：
   
