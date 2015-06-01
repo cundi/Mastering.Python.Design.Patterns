@@ -1,12 +1,27 @@
 # Mastering.Python.Design.Patterns
-译名《精通Python设计模式》
+  
+《精通Python设计模式》
+## 原版信息：
+https://www.packtpub.com/application-development/mastering-python-design-patterns  
 
-不同于上一本，学习设计模式，这本以Django框架来阐明多种设计模式。
+## 作者：
+Sakis Kasampalis  
 
-开坑，有空，边翻边学。
-第一章预览
-*****
-第一章 工厂模式
+## 纸书出版日期：
+January 2015  
+
+## 特色：
+Create various design patterns to master the art of solving problems using Python  
+
+## 级别：
+Progressing  
+
+
+```开坑。
+```
+  
+
+第一章预览 工厂模式
 ============
    创造模式处理一个对象的创建。创造模式的目的是为了在不按照约定而直接地创建的地方提供可选择的情况。  
    
